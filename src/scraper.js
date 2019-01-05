@@ -4,10 +4,9 @@ let promises = []
 
 module.exports = {
   getAllShows: function(page) {
-    let link = `https://www.livefromhere.org/listen/${page}.json/`     
-
+    let link = `https://www.livefromhere.org/listen/${page}.json/`
     return fetch(link).then((response, errorHandler) => {
-      const shows = module.exports.getIndividualShow(response)   
+      const shows = module.exports.getIndividualShow(response)
       promises.push(shows)
       console.log(chalk.blue(`Fetching from ${link}`))
       response = JSON.parse(response)
@@ -37,5 +36,5 @@ module.exports = {
       last_updated_ms: Date.now(),
       most_recent_show: latestShow
     }
-  }  
+  }
 }
