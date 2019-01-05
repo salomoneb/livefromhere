@@ -40,9 +40,7 @@ function fetch(url) {
       }
       let body = ""
       response.on("data", (d) => body+=d)
-      response.on("end", () => {
-        resolve(body)
-      })
+      response.on("end", () => resolve(body))
     })
     request.on("error", (error) => console.log(`Having problems: ${error}`))
   })
