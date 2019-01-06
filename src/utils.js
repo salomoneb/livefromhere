@@ -1,12 +1,11 @@
 const chalk = require("chalk")
-const https = require("https")
 const fs = require("fs")
+const https = require("https")
 const path = require("path")
 
 module.exports = {
   errorHandler(error) {
-    console.log(chalk.red.bold(error))
-    console.log(error.stack)
+    console.log(chalk.red.bold(error.stack))
     return error
   },
   fetch(link) {
