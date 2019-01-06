@@ -1,14 +1,14 @@
 const chalk = require("chalk")
 const https = require("https")
 const fs = require("fs")
-
+const path = require("path")
 
 module.exports = {
-  errorHandler: function(error) {
+  errorHandler(error) {
     console.log(chalk.red.bold(error))
-    return new Error(error)
+    return error
   },
-  fetch: function(link) {
+  fetch(link) {
     return new Promise((resolve, reject) => {
       const request = https.get(link, (response) => {
         if (response.statusCode < 200 || response.statusCode > 299) {
@@ -23,15 +23,30 @@ module.exports = {
       })
     })
   },
-  flatten: function(array) {
+  flatten(array) {
     return array.reduce((a,b) => a.concat(b))
   },
-  writeFile: function(location, data) {
-    fs.writeFile(location, data, (err) => {
-      if (err) {
-        return module.exports.errorHandler(`Error writing to ${location}: ${err}`)
+  sort(array) {
+    return array.sort((show1, show2) => {
+      return show1.date_ms - show2.date_ms
+    })
+  },
+  writeFile(file, directory, data) {
+    const filePath = path.join(directory, file)
+    fs.writeFile(filePath, data, (error) => {
+      if (error) {
+        module.exports.errorHandler(`Error writing to ${file}: ${error}`)
+        if (error.code === "ENOENT") {
+          fs.mkdir(directory, { recursive: false }, (err) => {
+            console.log(chalk.hex("#008080")`CREATING DIRECTORY: ${directory}`)
+            return module.exports.writeFile(file, directory, data)
+            if (err) {
+              return module.exports.errorHandler(`Error creating directory: ${err}`)
+            }
+          })
+        }
       }
-      console.log(chalk.green.bold(`Finished writing to ${location}`))
+      console.log(chalk.green.bold(`Finished writing to ${file}`))
     })
   }
 }
