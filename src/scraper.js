@@ -6,8 +6,8 @@ module.exports = {
   getAllShows: function(page) {
     let link = `https://www.livefromhere.org/listen/${page}.json/`
     return fetch(link).then((response, errorHandler) => {
-      const shows = module.exports.getIndividualShow(response)
-      promises.push(shows)
+      const show = module.exports.getIndividualShow(response)
+      promises.push(show)
       console.log(chalk.blue(`Fetching from ${link}`))
       response = JSON.parse(response)
       if (response.next_page) {

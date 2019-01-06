@@ -2,10 +2,11 @@ const chalk = require("chalk")
 const https = require("https")
 const fs = require("fs")
 
+
 module.exports = {
   errorHandler: function(error) {
     console.log(chalk.red.bold(error))
-    return error
+    return new Error(error)
   },
   fetch: function(link) {
     return new Promise((resolve, reject) => {
@@ -27,7 +28,9 @@ module.exports = {
   },
   writeFile: function(location, data) {
     fs.writeFile(location, data, (err) => {
-      if (err) errorHandler(`Error writing to ${location}: ${err}`)
+      if (err) {
+        return module.exports.errorHandler(`Error writing to ${location}: ${err}`)
+      }
       console.log(chalk.green.bold(`Finished writing to ${location}`))
     })
   }
