@@ -6,6 +6,7 @@ const path = require("path")
 module.exports = {
   errorHandler(error) {
     console.log(chalk.red.bold(error))
+    console.log(error.stack)
     return error
   },
   fetch(link) {
@@ -45,8 +46,10 @@ module.exports = {
             }
           })
         }
+      } else {
+        console.log(chalk.green.bold(`Finished writing to ${file}`))
+        return
       }
-      console.log(chalk.green.bold(`Finished writing to ${file}`))
     })
   }
 }
