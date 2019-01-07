@@ -1,7 +1,7 @@
 const chalk = require("chalk")
 const fs = require("fs")
 const path = require("path")
-const { fetch, sort, errorHandler, createFileAndDirectory } = require("./utils.js")
+const { createFileAndDirectory, errorHandler, fetch, sort } = require("./utils.js")
 const showPath = path.join(__dirname, "..", "..", "data")
 const showFile = "shows.json"
 let promises = []
