@@ -1,11 +1,11 @@
 const path = require("path")
 const fs = require("fs")
 const { errorHandler } = require("./utils.js")
-const { getShows, readManifest, updateManifest, updateShows} = require("./data.js")
+const { retrieve, transform, read, write } = require("./data.js")
 let page = 1
 
-getShows(page)
-  .then(shows => updateManifest(shows))
-  .then(shows => readManifest(shows))
-  .then(showsAndManifestIds => updateShows(showsAndManifestIds))
+retrieve(page)
+  .then(data => transform(data))
+  .then(data => read(data))
+  .then(data => write(data))
   .catch(err => errorHandler(err))

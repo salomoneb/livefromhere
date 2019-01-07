@@ -1,84 +1,66 @@
 const chalk = require("chalk")
 const fs = require("fs")
 const path = require("path")
-const { fetch, sort, errorHandler, writeFile } = require("./utils.js")
-const showPath = path.join(__dirname, "..", "..", "dist")
-const manifestPath = path.join(__dirname, "..", "..", "dist")
+const { fetch, sort, errorHandler, createFileAndDirectory } = require("./utils.js")
+const showPath = path.join(__dirname, "..", "..", "data")
+const showFile = "shows.json"
 let promises = []
 
 module.exports = {
-  getShows(page) {
+  retrieve(page) {
     let link = `https://www.livefromhere.org/listen/${page}.json/`
     return fetch(link).then((response, errorHandler) => {
-      if (response) {
-        let shows = module.exports.getIndividualShow(response)
-        promises.push.apply(promises, shows)
-        console.log(chalk.blue(`Fetching from ${link}`))
-        response = JSON.parse(response)
+      if (response) { 
+        response = JSON.parse(response)              
+        promises.push.apply(promises, response.items)
+        console.log(chalk.blue(`Fetching from ${link}`))        
         if (response.next_page) {
           console.log(chalk.yellow(`Next page: ${response.next_page}`))
-          return module.exports.getShows(response.next_page)
+          return module.exports.retrieve(response.next_page)
         }
-        return sort(promises)
+        return promises
       }
     }).catch(error => errorHandler(error))
   },
-  getIndividualShow(data) {
-    data = JSON.parse(data)
-    return data.items.map(show => {
-      return {
-        id: show.audio.id,
-        date: show.audio.created_at,
-        date_ms: Date.parse(show.audio.created_at),
-        duration: show.audio.duration_hms,
-        title: show.title,
-        audio: show.audio.encodings[0].http_file_path,
-        artists: show.title.trim().replace("and", "").split(",")
-      }
-    })
-  },
-  readManifest(shows) {
+  transform(shows) {
     return new Promise((resolve, reject) => {
-      fs.readFile(path.join(manifestPath, "manifest.json"), (error, data) => {
-        resolve([shows, data])
-      })
-    })
-  },
-  updateManifest(shows) {
-    return new Promise((resolve, reject) => {
-      fs.readFile(path.join(manifestPath, "manifest.json"), (error, data) => {
-        const manifestData = {
-          last_updated_date: new Date(Date.now()),
-          last_updated_ms: Date.now(),
-          shows: []
-        }
-        if (data) { // If manifest already exists, push in new show IDs
-          const showIds = JSON.parse(data).shows
-          shows.forEach(show => {
-            if (!showIds.includes(show.id)) showIds.push(show.id)
-          })
-          manifestData.shows = showIds
-        } else {
-          manifestData.shows = [...shows.map(show => show.id)]
-        }
-        writeFile("manifest.json", manifestPath, JSON.stringify(manifestData))
+      shows = shows.map(show => {
+        return {
+          id: show.audio.id,
+          date: show.audio.created_at,
+          date_ms: Date.parse(show.audio.created_at),
+          duration: show.audio.duration_hms,
+          title: show.title,
+          audio: show.audio.encodings[0].http_file_path,
+          artists: show.title.trim().replace("and", "").split(",")
+        }        
       })
       resolve(shows)
     })
   },
-  updateShows(showsAndManifestIds) { // Accepts an array of shows and updated manifest IDs
+  read(shows) {
     return new Promise((resolve, reject) => {
-      fs.readFile(path.join(showPath, "shows.json"), (error, data) => {
-        if (error && error.code ==="ENOENT") {
-          writeFile("shows.json", showPath, JSON.stringify(showsAndManifestIds[0]))
-          return
-        }
-        if (!error) { // If the show file exists
-          let updatedShows = showsAndManifestIds[0].filter(show => showsAndManifestIds[1].includes(show.id))
-          writeFile("shows.json", showPath, JSON.stringify(showsAndManifestIds[0]))
-        }
-        resolve(showsAndManifestIds[0])
+      const showOutput = path.join(showPath, showFile)
+      fs.readFile(showOutput, (error, data) => {
+        resolve([shows, data])
       })
     })
+  },
+  write(shows) {
+    let [newShows, oldShows] = shows    
+    if (!oldShows) {
+      createFileAndDirectory(showFile, showPath, JSON.stringify(newShows))
+      return
+    } else {
+      oldShows = JSON.parse(oldShows)
+      let updatedShows = [...oldShows]
+      let ids = oldShows.map(show => show.id)
+      newShows.forEach(show => {
+        if (!ids.includes(show.id)) updatedShows.push(show)   
+      })
+      updatedShows = sort(updatedShows)
+      createFileAndDirectory(showFile, showPath, JSON.stringify(updatedShows))
+      return
+    }
   },
 }

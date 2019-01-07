@@ -28,7 +28,7 @@ module.exports = {
       return show1.date_ms - show2.date_ms
     })
   },
-  writeFile(file, directory, data) {
+  createFileAndDirectory(file, directory, data) {
     const filePath = path.join(directory, file)
     fs.writeFile(filePath, data, (error) => {
       if (error) {
@@ -36,7 +36,7 @@ module.exports = {
         if (error.code === "ENOENT") {
           fs.mkdir(directory, { recursive: false }, (err) => {
             console.log(chalk.hex("#008080")`CREATING DIRECTORY: ${directory}`)
-            return module.exports.writeFile(file, directory, data)
+            return module.exports.createFileAndDirectory(file, directory, data)
             if (err) {
               return module.exports.errorHandler(`Error creating directory: ${err}`)
             }
