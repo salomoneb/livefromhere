@@ -23,9 +23,6 @@ module.exports = {
       })
     })
   },
-  flatten(array) {
-    return array.reduce((a,b) => a.concat(b))
-  },
   sort(array) {
     return array.sort((show1, show2) => {
       return show1.date_ms - show2.date_ms
