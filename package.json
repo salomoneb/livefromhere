@@ -4,7 +4,7 @@
   "description": "",
   "main": "scraper.js",
   "scripts": {
-    "s3": "aws s3 cp 'data/shows.json' 's3://livefromhere' "
+    "s3": "aws s3 cp 'data/shows.json' 's3://livefromhere' --acl public-read-write"
   },
   "author": "",
   "license": "ISC",
