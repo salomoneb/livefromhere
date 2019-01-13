@@ -48,7 +48,6 @@ module.exports = {
             if (artist.indexOf("and") === 0) artist = artist.slice(4)
             return artist
           })
-          console.log(`Adding ${data.title}`)
           return data
         }
       }).filter(show => show) // filter nulls
@@ -73,7 +72,10 @@ module.exports = {
       let updatedShows = [...oldShows]
       let ids = oldShows.map(show => show.id)
       newShows.forEach(show => {
-        if (!ids.includes(show.id)) updatedShows.push(show)
+        if (!ids.includes(show.id)) {
+          updatedShows.push(show)
+          console.log(`Adding ${show.title}`)
+        }
       })
       updatedShows = sort(updatedShows)
       createFileAndDirectory(showFile, showPath, JSON.stringify(updatedShows))

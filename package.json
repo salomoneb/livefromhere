@@ -2,11 +2,11 @@
   "name": "live-from-here",
   "version": "1.0.0",
   "description": "",
-  "scripts": {
-    "s3": "aws s3 cp 'data/shows.json' 's3://livefromhere' --acl public-read-write"
-  },
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "scrape": "node ./src/server/index.js"
+  },
   "dependencies": {
     "chalk": "^2.4.1"
   }
