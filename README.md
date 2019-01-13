@@ -3,6 +3,7 @@ Scrapes public radio's [best and most overlooked musical variety show](https://w
 
 ## Usage
 `npm install`
+
 `npm run scrape`
 
-`data/shows.json` is created and/or updated.
+`data/shows.json` is automatically created and/or updated.
