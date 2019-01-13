@@ -4,7 +4,7 @@
   "description": "",
   "main": "scraper.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "s3": "aws s3 cp 'data/shows.json' 's3://livefromhere' "
   },
   "author": "",
   "license": "ISC",
