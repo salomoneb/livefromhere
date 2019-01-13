@@ -2,7 +2,6 @@
   "name": "live-from-here",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "s3": "aws s3 cp 'data/shows.json' 's3://livefromhere' --acl public-read-write"
   },
