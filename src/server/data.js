@@ -12,10 +12,11 @@ const exclusions = [
   "1R4CE5VAEYQ4W68SD30N0R9HQW"
 ]
 let promises = []
+let baseUrl = "https://www.livefromhere.org/listen/"
 
 module.exports = {
   retrieve(page) {
-    let link = `https://www.livefromhere.org/listen/${page}.json/`
+    let link = `${baseUrl}${page}.json/`
     return fetch(link).then((response, errorHandler) => {
       if (response) {
         response = JSON.parse(response)
@@ -33,24 +34,36 @@ module.exports = {
     return new Promise((resolve, reject) => {
       shows = shows.map(show => {
         if (!exclusions.includes(show.audio.id)) {
-          let data = {
-            id: show.audio.id,
-            date: show.audio.created_at,
-            date_ms: Date.parse(show.audio.created_at),
-            duration: show.audio.duration_hms,
-            title: show.title,
-            audio: show.audio.encodings[0].http_file_path,
-            artists: show.title.split(","),
-            last_updated: new Date(Date.now())
-          }
-          data.artists = data.artists.map(artist => {
-            artist = artist.trim()
-            if (artist.indexOf("and") === 0) artist = artist.slice(4)
-            return artist
-          })
-          return data
+          return show.slug
         }
       }).filter(show => show) // filter nulls
+      resolve(shows)
+    })
+  },
+  retrieveArtists(shows) {
+    let individualData = shows.map(show => {
+      console.log(`Fetching ${baseUrl}${show}.json/`)
+      console.log(fetch(`${baseUrl}${show}.json/`))
+      return fetch(`${baseUrl}${show}.json/`).then(response => {
+        return JSON.parse(response)
+      })
+    })
+    return Promise.all(individualData)
+  },
+  transformAgain(shows) {
+    return new Promise((resolve, reject) => {
+      shows = shows.map(show => {
+        return {
+          id: show.audio.id,
+          date: show.audio.created_at,
+          date_ms: Date.parse(show.audio.created_at),
+          duration: show.audio.duration_hms,
+          title: show.title,
+          audio: show.audio.encodings[0].http_file_path,
+          artists: show.contributors,
+          last_updated: new Date(Date.now())
+        }
+      })
       resolve(shows)
     })
   },
