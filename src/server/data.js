@@ -1,7 +1,7 @@
 const chalk = require("chalk")
 const fs = require("fs")
 const path = require("path")
-const { createFileAndDirectory, errorHandler, fetch, sort } = require("./utils.js")
+const { createFileAndDirectory, errorHandler, fetch, updateShows } = require("./utils.js")
 
 const showPath = path.join(__dirname, "../..", "data")
 const showFile = "shows.json"
@@ -15,22 +15,24 @@ let promises = []
 let baseUrl = "https://www.livefromhere.org/listen/"
 
 module.exports = {
-  retrieve(page) {
+  // Retrieve the lists of all shows
+  getAll(page) {
     let link = `${baseUrl}${page}.json/`
     return fetch(link).then((response, errorHandler) => {
       if (response) {
         response = JSON.parse(response)
-        promises.push.apply(promises, response.items)
+        promises.push.apply(promises, response.items) // Nice way to flatten the array
         console.log(chalk.blue(`Fetching from ${link}`))
         if (response.next_page) {
           console.log(chalk.yellow(`Next page: ${response.next_page}`))
-          return module.exports.retrieve(response.next_page)
+          return module.exports.getAll(response.next_page)
         }
         return promises
       }
     }).catch(error => errorHandler(error))
   },
-  transform(shows) {
+  // Return an array of filtered slugs
+  filterIds(shows) {
     return new Promise((resolve, reject) => {
       shows = shows.map(show => {
         if (!exclusions.includes(show.audio.id)) {
@@ -40,17 +42,18 @@ module.exports = {
       resolve(shows)
     })
   },
-  retrieveArtists(shows) {
+  // Make individual calls to each show
+  getIndividual(shows) {
     let individualData = shows.map(show => {
-      console.log(`Fetching ${baseUrl}${show}.json/`)
-      console.log(fetch(`${baseUrl}${show}.json/`))
+      console.log(chalk.cyan(`Fetching ${baseUrl}${show}.json/`))
       return fetch(`${baseUrl}${show}.json/`).then(response => {
         return JSON.parse(response)
       })
     })
     return Promise.all(individualData)
   },
-  transformAgain(shows) {
+  // Transform our data
+  transform(shows) {
     return new Promise((resolve, reject) => {
       shows = shows.map(show => {
         return {
@@ -59,14 +62,16 @@ module.exports = {
           date_ms: Date.parse(show.audio.created_at),
           duration: show.audio.duration_hms,
           title: show.title,
+          slug: show.slug,
           audio: show.audio.encodings[0].http_file_path,
-          artists: show.contributors,
+          artists: show.contributors.map(artist => artist.title),
           last_updated: new Date(Date.now())
         }
       })
       resolve(shows)
     })
   },
+  // Check if the file exists
   read(shows) {
     return new Promise((resolve, reject) => {
       const showOutput = path.join(showPath, showFile)
@@ -75,22 +80,14 @@ module.exports = {
       })
     })
   },
+  // Write the file and directory
   write(shows) {
     let [newShows, oldShows] = shows
     if (!oldShows) {
       createFileAndDirectory(showFile, showPath, JSON.stringify(newShows))
       return
     } else {
-      oldShows = JSON.parse(oldShows)
-      let updatedShows = [...oldShows]
-      let ids = oldShows.map(show => show.id)
-      newShows.forEach(show => {
-        if (!ids.includes(show.id)) {
-          updatedShows.push(show)
-          console.log(`Adding ${show.title}`)
-        }
-      })
-      updatedShows = sort(updatedShows)
+      let updatedShows = updateShows(oldShows, newShows)
       createFileAndDirectory(showFile, showPath, JSON.stringify(updatedShows))
       return
     }

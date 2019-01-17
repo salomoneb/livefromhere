@@ -24,11 +24,6 @@ module.exports = {
       })
     })
   },
-  sort(array) {
-    return array.sort((show1, show2) => {
-      return show1.date_ms - show2.date_ms
-    })
-  },
   createFileAndDirectory(file, directory, data) {
     const filePath = path.join(directory, file)
     fs.writeFile(filePath, data, (error) => {
@@ -48,5 +43,17 @@ module.exports = {
         return
       }
     })
+  },
+  updateShows(oldShows, newShows) {
+    oldShows = JSON.parse(oldShows)
+    let updatedShows = [...oldShows]
+    let ids = oldShows.map(show => show.id)
+    newShows.forEach(show => {
+      if (!ids.includes(show.id)) {
+        updatedShows.push(show)
+        console.log(`Adding ${show.title}`)
+      }
+    })
+    return updatedShows
   }
 }
