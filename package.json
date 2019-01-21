@@ -6,9 +6,17 @@
   "license": "ISC",
   "scripts": {
     "s3": "aws s3 cp ./data/shows.json s3://livefromhere --acl public-read-write",
-    "scrape": "node ./src/server/index.js"
+    "scrape": "node ./app/scrape.js",
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
   },
   "dependencies": {
-    "chalk": "^2.4.1"
+    "axios": "^0.18.0",
+    "chalk": "^2.4.1",
+    "cross-env": "^5.2.0",
+    "nodemon": "^1.18.9",
+    "nuxt": "^2.3.4"
   }
 }
