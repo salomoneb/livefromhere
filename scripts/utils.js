@@ -8,6 +8,11 @@ module.exports = {
     console.log(chalk.red.bold(error.stack))
     return error
   },
+  sort(array) {
+    return array.sort((show1, show2) => {
+      return show2.date_ms - show1.date_ms
+    })
+  },
   fetch(link) {
     return new Promise((resolve, reject) => {
       const request = https.get(link, (response) => {

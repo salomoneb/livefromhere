@@ -3,7 +3,7 @@ const fs = require("fs")
 const path = require("path")
 const { createFileAndDirectory, errorHandler, fetch, filterExistingShows, updateShows } = require("./utils.js")
 
-const showPath = path.join(__dirname, "../..", "data")
+const showPath = path.join(__dirname, "..", "data")
 const showFile = "shows.json"
 const exclusions = [
   "01CZYDRCJXK43QJ5ZVYM07351A",
