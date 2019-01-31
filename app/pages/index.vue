@@ -1,7 +1,9 @@
 <template>
   <main>
     <h1>Hello world</h1>
-    <p v-for="artist in artists">{{artist}}</p>
+    <ul>
+      <li v-for="artist in shuffledArtists">{{artist}}</li>
+    </ul>
 <!--     <template v-for="show in shows">
       <h2 >{{show.artists}}</h2>
       <figure>
@@ -19,7 +21,8 @@
   export default {
     data() {
       return {
-        shows: []
+        shows: [],
+        shuffledArtists: []
       }
     },
     computed: {
@@ -31,12 +34,22 @@
         const artists = [...allArtists]
         return artists
       },
-      regulars() {
+    },
+    methods: {
+      shuffle(array) {
+        let m = array.length, t, i
 
+        while (m) {
+          i = Math.floor(Math.random() * m--)
+          t = array[m]
+          array[m] = array[i]
+          array[i] = t
+        }
+        return array
       }
     },
     mounted() {
-      console.log(this.$store.state.regulars)
+      this.shuffledArtists = this.shuffle(this.artists)
     },
     async asyncData () {
       const { data } = await axios.get("https://5iwwhjx9hc.execute-api.us-east-1.amazonaws.com/lfh")
@@ -44,3 +57,18 @@
     }
   }
 </script>
+
+<style>
+  ul {
+    padding: 0;
+  }
+  li {
+    display: inline;
+    font-size: 5vh;
+    list-style: none;
+  }
+  li + li {
+    padding-left: 0.3em;
+  }
+
+</style>
