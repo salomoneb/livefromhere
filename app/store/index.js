@@ -36,5 +36,36 @@ export const state = () => ({
     "Albert Webster",
     "Jason Colton",
     "Jeff Hnilicka",
-  ]
+  ],
+  search: "",
+  shows: [],
 })
+export const getters = {
+  artists(state) {
+    let allArtists = state.shows
+      .map(show => show.artists)
+      .reduce((list, artist) => list.concat(artist))
+    allArtists = new Set(allArtists)
+    const artists = [...allArtists]
+    return artists.sort()
+  },
+  shows(state) {
+    return state.shows
+  }
+}
+export const mutations = {
+  setSearch(state, search) {
+    return state.search = search
+  },
+  setShows(state, shows) {
+    return state.shows = shows
+  }
+}
+export const actions = {
+  setSearch({ commit }) {
+    return commit("setSearch")
+  },
+  setShows({ commit }) {
+    return commit("setShows")
+  }
+}

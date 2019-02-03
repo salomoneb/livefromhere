@@ -1,74 +1,71 @@
 <template>
-  <main>
-    <h1>Hello world</h1>
-    <ul>
-      <li v-for="artist in shuffledArtists">{{artist}}</li>
-    </ul>
-<!--     <template v-for="show in shows">
-      <h2 >{{show.artists}}</h2>
-      <figure>
-        <audio controls :src="show.audio">Your browser does not support the <code>audio</code> element.
-        </audio>
-      </figure>
-    </template> -->
-  </main>
+  <div class="wrapper">
+    <sidebar></sidebar>
+    <artists></artists>
+  </div>
 </template>
 
 <script>
   import axios from "axios"
-  import { mapGetters } from "vuex"
+  import Artists from "@/components/Artists"
+  import Sidebar from "@/components/Sidebar"
 
   export default {
-    data() {
-      return {
-        shows: [],
-        shuffledArtists: []
-      }
+    components: {
+      Artists,
+      Sidebar
     },
-    computed: {
-      artists() {
-        let allArtists = this.shows
-          .map(show => show.artists)
-          .reduce((list, artist) => list.concat(artist))
-        allArtists = new Set(allArtists)
-        const artists = [...allArtists]
-        return artists
-      },
-    },
-    methods: {
-      shuffle(array) {
-        let m = array.length, t, i
-
-        while (m) {
-          i = Math.floor(Math.random() * m--)
-          t = array[m]
-          array[m] = array[i]
-          array[i] = t
-        }
-        return array
-      }
-    },
-    mounted() {
-      this.shuffledArtists = this.shuffle(this.artists)
-    },
-    async asyncData () {
+    async fetch({ store, params }) {
       const { data } = await axios.get("https://5iwwhjx9hc.execute-api.us-east-1.amazonaws.com/lfh")
-      return { shows: data }
+      store.commit("setShows", data)
     }
   }
 </script>
 
 <style>
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+  }
+  .wrapper * {
+    display: inline;
+  }
+  aside {
+    flex-basis: 25%;
+  }
+  main, nav, h1, ul, li {
+    display: inline;
+    flex-basis: 75%;
+    font-size: 1.2rem;
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+  h1, li {
+    cursor: pointer;
+  }
+  h1 {
+    color: red;
+  }
   ul {
     padding: 0;
   }
   li {
-    display: inline;
-    font-size: 5vh;
-    list-style: none;
+    color: blue;
+    word-break: break-all;
   }
   li + li {
-    padding-left: 0.3em;
+    margin-left: 0.3em;
   }
+  input {
+    height: 2rem;
+    padding: 5px;
+    margin: auto;
+    width: 100%;
+  }
+  dt, dd {
+    display: inline-block;
+  }
+  .legend-guest {
 
+  }
 </style>
