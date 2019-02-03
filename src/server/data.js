@@ -1,7 +1,7 @@
 const chalk = require("chalk")
 const fs = require("fs")
 const path = require("path")
-const { createFileAndDirectory, errorHandler, fetch, updateShows } = require("./utils.js")
+const { createFileAndDirectory, errorHandler, fetch, filterExistingShows, updateShows } = require("./utils.js")
 
 const showPath = path.join(__dirname, "../..", "data")
 const showFile = "shows.json"
@@ -36,17 +36,32 @@ module.exports = {
     return new Promise((resolve, reject) => {
       shows = shows.map(show => {
         if (!exclusions.includes(show.audio.id)) {
-          return show.slug
+          return {
+            id: show.audio.id,
+            slug: show.slug
+          }
         }
       }).filter(show => show) // filter nulls
       resolve(shows)
     })
   },
+  // Check if the file exists and return data
+  read(shows) {
+    return new Promise((resolve, reject) => {
+      const showOutput = path.join(showPath, showFile)
+      fs.readFile(showOutput, (error, data) => {
+        if (data) {
+          shows = filterExistingShows(shows, data)
+        }
+        resolve(shows)
+      })
+    })
+  },
   // Make individual calls to each show
   getIndividual(shows) {
     let individualData = shows.map(show => {
-      console.log(chalk.cyan(`Fetching ${baseUrl}${show}.json/`))
-      return fetch(`${baseUrl}${show}.json/`).then(response => {
+      console.log(chalk.cyan(`Fetching ${baseUrl}${show.slug}.json/`))
+      return fetch(`${baseUrl}${show.slug}.json/`).then(response => {
         return JSON.parse(response)
       })
     })
@@ -71,25 +86,17 @@ module.exports = {
       resolve(shows)
     })
   },
-  // Check if the file exists
-  read(shows) {
-    return new Promise((resolve, reject) => {
-      const showOutput = path.join(showPath, showFile)
-      fs.readFile(showOutput, (error, data) => {
-        resolve([shows, data])
-      })
-    })
-  },
   // Write the file and directory
   write(shows) {
-    let [newShows, oldShows] = shows
-    if (!oldShows) {
-      createFileAndDirectory(showFile, showPath, JSON.stringify(newShows))
-      return
-    } else {
-      let updatedShows = updateShows(oldShows, newShows)
-      createFileAndDirectory(showFile, showPath, JSON.stringify(updatedShows))
-      return
-    }
+    fs.readFile(path.join(showPath, showFile), (err, data) => {
+      if (err && err.code === 'ENOENT') {
+        createFileAndDirectory(showFile, showPath, JSON.stringify(shows))
+        return
+      } else {
+        let updatedShows = updateShows(data, shows)
+        createFileAndDirectory(showFile, showPath, JSON.stringify(updatedShows))
+        return
+      }
+    })
   },
 }

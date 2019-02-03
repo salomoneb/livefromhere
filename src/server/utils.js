@@ -24,6 +24,17 @@ module.exports = {
       })
     })
   },
+  filterExistingShows(newShows, oldShows) {
+    existingIds = JSON.parse(oldShows).map(oldShows => oldShows.id)
+    return newShows.filter(show => {
+      return !existingIds.includes(show.id)
+    })
+  },
+  sort(array) {
+    return array.sort((show1, show2) => {
+      return show2.date_ms - show1.date_ms
+    })
+  },
   createFileAndDirectory(file, directory, data) {
     const filePath = path.join(directory, file)
     fs.writeFile(filePath, data, (error) => {
@@ -31,7 +42,7 @@ module.exports = {
         module.exports.errorHandler(`Error writing to ${file}: ${error}`)
         if (error.code === "ENOENT") {
           fs.mkdir(directory, { recursive: false }, (err) => {
-            console.log(chalk.hex("#008080")`CREATING DIRECTORY: ${directory}`)
+            console.log(chalk.hex("#008080")(`CREATING DIRECTORY: ${directory}`))
             return module.exports.createFileAndDirectory(file, directory, data)
             if (err) {
               return module.exports.errorHandler(`Error creating directory: ${err}`)
@@ -54,6 +65,7 @@ module.exports = {
         console.log(`Adding ${show.title}`)
       }
     })
+    updatedShows = module.exports.sort(updatedShows)
     return updatedShows
   }
 }
