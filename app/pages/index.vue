@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
-    <sidebar></sidebar>
-    <artists></artists>
+    <sidebar class="sidebar"></sidebar>
+    <artists class="main"></artists>
   </div>
 </template>
 
@@ -23,15 +23,18 @@
 </script>
 
 <style>
+  .wrapper * {
+    display: inline;
+  }
   .wrapper {
     display: flex;
     flex-direction: row;
   }
-  .wrapper * {
-    display: inline;
-  }
-  aside {
+  .sidebar {
     flex-basis: 25%;
+  }
+  .main {
+    margin-left: 2rem;
   }
   main, nav, h1, ul, li {
     display: inline;

@@ -8,3 +8,9 @@
     </nav>
   </header>
 </template>
+
+<style>
+  .date {
+    color: green;
+  }
+</style>

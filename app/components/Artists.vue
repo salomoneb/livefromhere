@@ -3,7 +3,6 @@
     <header-component></header-component>
     <ul>
       <li v-for="artist in filteredArtists" :class="{'regular': regular(artist)}">{{artist}}</li>
-      <li v-if="!filteredArtists.length">No results</li>
     </ul>
   </main>
 </template>
@@ -36,5 +35,8 @@
 <style>
   li:hover {
     background-color: #ffa5dd;
+  }
+  .regular {
+    color: orange;
   }
 </style>
