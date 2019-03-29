@@ -1,5 +1,5 @@
 ## Live From Here AF (Artist Finder)
-Scrapes public radio's [best and most overlooked musical variety show](https://www.livefromhere.org/) and creates a JSON file which we can use as an [API endpoint](https://5iwwhjx9hc.execute-api.us-east-1.amazonaws.com/lfh).
+Scrapes public radio's best and most overlooked [musical variety show](https://www.livefromhere.org/) and creates a JSON file which we can use as an [API endpoint](https://5iwwhjx9hc.execute-api.us-east-1.amazonaws.com/lfh).
 
 Front-end TBD.
 
