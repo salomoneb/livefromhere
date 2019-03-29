@@ -89,7 +89,6 @@ module.exports = {
   // Write the file and directory
   write(shows) {
     fs.readFile(path.join(showPath, showFile), (err, data) => {
-      console.log(err)
       if (err && err.code === 'ENOENT') {
         createFileAndDirectory(showFile, showPath, JSON.stringify(shows))
         return
