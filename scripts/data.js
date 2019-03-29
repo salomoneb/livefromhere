@@ -3,7 +3,7 @@ const fs = require("fs")
 const path = require("path")
 const { createFileAndDirectory, errorHandler, fetch, filterExistingShows, updateShows } = require("./utils.js")
 
-const showPath = path.join(__dirname, "../..", "data")
+const showPath = path.join(__dirname, "..", "data")
 const showFile = "shows.json"
 const exclusions = [
   "01CZYDRCJXK43QJ5ZVYM07351A",
@@ -35,7 +35,7 @@ module.exports = {
   filterIds(shows) {
     return new Promise((resolve, reject) => {
       shows = shows.map(show => {
-        if (!exclusions.includes(show.audio.id)) {
+        if (show.audio && show.audio.id && !exclusions.includes(show.audio.id)) {
           return {
             id: show.audio.id,
             slug: show.slug
@@ -89,6 +89,7 @@ module.exports = {
   // Write the file and directory
   write(shows) {
     fs.readFile(path.join(showPath, showFile), (err, data) => {
+      console.log(err)
       if (err && err.code === 'ENOENT') {
         createFileAndDirectory(showFile, showPath, JSON.stringify(shows))
         return

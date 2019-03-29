@@ -6,7 +6,7 @@
   "license": "ISC",
   "scripts": {
     "s3": "aws s3 cp ./data/shows.json s3://livefromhere --acl public-read-write",
-    "scrape": "node ./src/server/index.js"
+    "scrape": "node ./scripts/index.js"
   },
   "dependencies": {
     "chalk": "^2.4.1"
