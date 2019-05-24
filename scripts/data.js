@@ -35,7 +35,7 @@ module.exports = {
   filterIds(shows) {
     return new Promise((resolve, reject) => {
       shows = shows.map(show => {
-        if (!exclusions.includes(show.audio.id)) {
+        if (show.audio && show.audio.id && !exclusions.includes(show.audio.id)) {
           return {
             id: show.audio.id,
             slug: show.slug
